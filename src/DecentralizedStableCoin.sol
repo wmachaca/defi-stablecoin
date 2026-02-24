@@ -29,20 +29,20 @@ import {ERC20Burnable, ERC20} from "@openzeppelin/contracts/token/ERC20/extensio
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 /*
-* @title Decentralized Stable Coin
-* @author WIMA
-* Collateral: Exogenous (ETH & BTC)
-* Minting: Algorithmic
-* Relative Stability: Pegged to USD
-*
-* This is the contract meant to be governed by DSCEngine. This contract is just the ERC20 implementation of our stablecoin system. 
-*/
+ * @title Decentralized Stable Coin
+ * @author WIMA
+ * Collateral: Exogenous (ETH & BTC)
+ * Minting: Algorithmic
+ * Relative Stability: Pegged to USD
+ *
+ * This is the contract meant to be governed by DSCEngine. This contract is just the ERC20 implementation of our stablecoin system.
+ */
 contract DecentralizedStableCoin is ERC20Burnable, Ownable {
     error DecentralizedStableCoin__MustBeMoreThanZero();
     error DecentralizedStableCoin__BurnAmountExceedsBalance();
     error DecentralizedStableCoin__NotZeroAddress();
 
-    constructor() ERC20("Decentralized Stable Coin", "DSC") Ownable(msg.sender){}
+    constructor() ERC20("Decentralized Stable Coin", "DSC") Ownable(msg.sender) {}
 
     function burn(uint256 _amount) public override onlyOwner {
         uint256 balance = balanceOf(_msgSender());
@@ -52,7 +52,7 @@ contract DecentralizedStableCoin is ERC20Burnable, Ownable {
         if (balance < _amount) {
             revert DecentralizedStableCoin__BurnAmountExceedsBalance();
         }
-        super.burn(_amount);//calls the burn function defined in the parent contract (ERC20Burnable) to perform the actual burning of tokens.
+        super.burn(_amount); //calls the burn function defined in the parent contract (ERC20Burnable) to perform the actual burning of tokens.
     }
 
     function mint(address _to, uint256 _amount) external onlyOwner returns (bool) {

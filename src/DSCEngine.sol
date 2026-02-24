@@ -36,17 +36,19 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * - Exogenous Collateral (ETH & BTC)
  * - Pegged to USD
  * - Algorithmic Stable
- * 
+ *
  * It is similar to DAI if DAI had no governance, no fees, and was only backed by WETH and WBTC.
- * 
- * Our DSC system should allways be "overcollateralized". At no point, 
+ *
+ * Our DSC system should allways be "overcollateralized". At no point,
  * should the value of all collateral <= the $ backed value of all the DSC.
- * 
- * @notice This contract is the core of the DSC System. It handles all the logic for mining and redeeming DSC, 
+ *
+ * @notice This contract is the core of the DSC System. It handles all the logic for mining and redeeming DSC,
  * as well as depositing  & withdrawing collateral.
  * @notice This contract is VERY loosely based on the MakerDAO DSS (DAI) system.
  */
-contract DSCEngine is ReentrancyGuard { // ReentrancyGuard is a contract from OpenZeppelin that helps prevent reentrancy attacks by adding a modifier to functions that should not be called recursively. It is more gas consuming than a regular function.
+contract DSCEngine is
+    ReentrancyGuard // ReentrancyGuard is a contract from OpenZeppelin that helps prevent reentrancy attacks by adding a modifier to functions that should not be called recursively. It is more gas consuming than a regular function.
+{
     ////////////
     // Errors //
     ////////////
@@ -54,7 +56,6 @@ contract DSCEngine is ReentrancyGuard { // ReentrancyGuard is a contract from Op
     error DSCEngine__TokenAddressesAndPriceFeedAddressesMustBeSameLength();
     error DSCEngine_NotAllowedToken();
     error DSCEngine__TransferFailed();
-
 
     /////////////////////
     // State Variables //
@@ -64,23 +65,20 @@ contract DSCEngine is ReentrancyGuard { // ReentrancyGuard is a contract from Op
 
     DecentralizedStableCoin private immutable i_dsc; // the DSC token contract
 
-
     ////////////
     // Events //
     ////////////
     event CollateralDeposited(address indexed user, address indexed token, uint256 amount);
-
-
 
     ///////////////
     // Modifiers //
     ///////////////
 
     modifier moreThanZero(uint256 amount) {
-        if(amount == 0) {
+        if (amount == 0) {
             revert DSCEngine__MustBeMoreThanZero();
         }
-        _;// function runs after the modifier
+        _; // function runs after the modifier
     }
 
     modifier isAllowedToken(address token) {
@@ -90,7 +88,6 @@ contract DSCEngine is ReentrancyGuard { // ReentrancyGuard is a contract from Op
         }
         _;
     }
-
 
     ///////////////
     // Functions //
@@ -106,37 +103,37 @@ contract DSCEngine is ReentrancyGuard { // ReentrancyGuard is a contract from Op
         i_dsc = DecentralizedStableCoin(dscAddress);
     }
 
-
     ////////////////////////
     // External Functions //
     ////////////////////////
 
-    function depositCollateralAndMintDsc()  external {}
-
+    function depositCollateralAndMintDsc() external {}
 
     /**
      * @notice follows CEI pattern. First, the user deposits collateral, then they can mint DSC in the same transaction. This is more efficient than having two separate transactions for depositing collateral and minting DSC.
-     * @param tokenCollateralAddress The address of the token to deposit as collateral. (WETH or WBTC) 
+     * @param tokenCollateralAddress The address of the token to deposit as collateral. (WETH or WBTC)
      * @param amountCollateral The amount of the token to deposit as collateral.
      */
-    function depositCollateral(address tokenCollateralAddress, uint256 amountCollateral) external moreThanZero(amountCollateral) isAllowedToken(tokenCollateralAddress) nonReentrant {
+    function depositCollateral(
+        address tokenCollateralAddress,
+        uint256 amountCollateral
+    ) external moreThanZero(amountCollateral) isAllowedToken(tokenCollateralAddress) nonReentrant {
         s_collateralDeposited[msg.sender][tokenCollateralAddress] += amountCollateral;
         emit CollateralDeposited(msg.sender, tokenCollateralAddress, amountCollateral);
         bool success = IERC20(tokenCollateralAddress).transferFrom(msg.sender, address(this), amountCollateral);
-        if(!success) {
+        if (!success) {
             revert DSCEngine__TransferFailed();
         }
     }
-    
-    
+
     function redeemCollateralForDsc() external {}
     function redeemCollateral() external {}
     function mintDsc() external {}
     function burnDsc() external {}
 
-    // Threshold to let's say 150%. That means if the value of the collateral falls below 150% of 
-    // the value of the DSC ($75 ETH), then anyone can call the liquidate function to liquidate the position. 
-    // $ 100 ETH -> $ 40 ETH. (Undercollateralized). User needs to add more collateral to their position or they will be liquidated.    
+    // Threshold to let's say 150%. That means if the value of the collateral falls below 150% of
+    // the value of the DSC ($75 ETH), then anyone can call the liquidate function to liquidate the position.
+    // $ 100 ETH -> $ 40 ETH. (Undercollateralized). User needs to add more collateral to their position or they will be liquidated.
     // $50 DSC. User needs to pay back $50 DSC + fees to get their collateral back.
 
     // If someone pays back your minted DSC, they can have all your collateral for a discount.

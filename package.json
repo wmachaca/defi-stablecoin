@@ -1,0 +1,22 @@
+{
+  "name": "defi-stablecoin",
+  "private": true,
+  "version": "0.1.0",
+  "type": "commonjs",
+  "scripts": {
+    "format:sol": "prettier --write \"src/**/*.sol\" \"script/**/*.sol\" \"test/**/*.sol\"",
+    "lint:sol": "solhint \"src/**/*.sol\" \"script/**/*.sol\" \"test/**/*.sol\"",
+    "format:js": "prettier --write \"**/*.{js,json,md}\"",
+    "lint:js": "eslint .",
+    "format": "npm run format:sol && npm run format:js",
+    "lint": "npm run lint:sol && npm run lint:js"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.15.0",
+    "eslint": "^9.15.0",
+    "globals": "^15.11.0",
+    "prettier": "^3.3.3",
+    "prettier-plugin-solidity": "^1.4.1",
+    "solhint": "^4.1.1"
+  }
+}
