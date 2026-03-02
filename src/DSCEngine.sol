@@ -60,6 +60,7 @@ contract DSCEngine is
     error DSCEngine__TransferFailed();
     error DSCEngine__BreaksHealthFactor();
     error DSCEngine__InvalidPrice();
+    error DSCEngine__MintFailed();
 
     /////////////////////
     // State Variables //
@@ -149,8 +150,13 @@ contract DSCEngine is
         // If not, revert the transaction.
         // If yes, mint the DSC to the user.
 
-        _revertIfHealthFactorIsBroken(msg.sender);
         // If the user doesn't have enough collateral, the health factor will be < 1 and the transaction will revert.
+        _revertIfHealthFactorIsBroken(msg.sender);
+
+        bool minted = DSC.mint(msg.sender, amountDscToMint)
+        if (¡minted) {
+            revert DSCEngine__MintFailed();
+        }
     }
     function burnDsc() external {}
 
