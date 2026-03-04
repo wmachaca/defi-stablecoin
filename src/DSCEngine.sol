@@ -23,7 +23,7 @@
 // private
 // view & pure functions
 
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.20;
 
 import {DecentralizedStableCoin} from "./DecentralizedStableCoin.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
@@ -153,8 +153,8 @@ contract DSCEngine is
         // If the user doesn't have enough collateral, the health factor will be < 1 and the transaction will revert.
         _revertIfHealthFactorIsBroken(msg.sender);
 
-        bool minted = DSC.mint(msg.sender, amountDscToMint)
-        if (¡minted) {
+        bool minted = DSC.mint(msg.sender, amountDscToMint);
+        if (!minted) {
             revert DSCEngine__MintFailed();
         }
     }
