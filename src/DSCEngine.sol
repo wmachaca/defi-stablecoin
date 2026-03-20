@@ -478,4 +478,15 @@ contract DSCEngine is
     function getLiquidationPrecision() external pure returns (uint256) {
         return LIQUIDATION_PRECISION;
     }
+
+    function getCollateralTokens() external view returns (address[] memory) {
+        return sCollateralTokens;
+    }
+
+    function getCollateralBalanceOfUser(address user, address token) external view returns (uint256) {
+        return sCollateralDeposited[user][token];
+    }
+    function getCollateralTokenPriceFeed(address token) external view returns (address) {
+        return sPriceFeeds[token];
+    }
 }
